@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/neon_background.dart';
+import '../../services/r1_service.dart';
 
 class HostRoundScreen extends StatelessWidget {
   final String code;
@@ -33,6 +34,15 @@ class HostRoundScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
+                ElevatedButton(
+                  onPressed: () async {
+                    await R1Service().buildAssignmentsForRoom(code);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fill assignments built for players.')));
+                  },
+                  child: const Text('BUILD FILL ASSIGNMENTS'),
+                ),
+                const SizedBox(height: 8),
                 ElevatedButton(onPressed: () {}, child: const Text('ADVANCE PHASE')),
               ],
             ),

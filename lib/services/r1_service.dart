@@ -48,4 +48,55 @@ class R1Service {
     final fills = roomRef.collection('r1_fills');
     await fills.add({'baseSentenceId': baseSentenceId, 'fillerUid': uid, 'values': values, 'createdAt': FieldValue.serverTimestamp()});
   }
+
+  // Assignment model: map playerUid -> baseSentenceId
+  Map<String, String> computeFillAssignments({required List<String> playerUids, required Map<String, String> sentenceAuthors, required List<String> sentenceIds}) {
+    // sentenceAuthors: sentenceId -> authorUid
+    // Goal: each player gets one sentence not authored by them; two players share same sentence.
+    final result = <String, String>{};
+    if (playerUids.isEmpty || sentenceIds.isEmpty) return result;
+
+    // Deterministic: sort inputs
+    final players = [...playerUids]..sort();
+    final sIds = [...sentenceIds];
+    sIds.sort();
+
+    int si = 0;
+    for (var i = 0; i < players.length; i += 2) {
+      final a = players[i];
+      final b = (i + 1 < players.length) ? players[i + 1] : null;
+      // Find a sentence neither authored; wrap if needed
+      for (var attempt = 0; attempt < sIds.length; attempt++) {
+        final sId = sIds[si % sIds.length];
+        final author = sentenceAuthors[sId];
+        si++;
+        if (author != a && (b == null || author != b)) {
+          result[a] = sId;
+          if (b != null) result[b] = sId; // both fill same sentence
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  Future<void> buildAssignmentsForRoom(String code) async {
+    final db = FirebaseFirestore.instance;
+    final roomRef = db.collection('rooms').doc(code);
+    final playersSnap = await roomRef.collection('players').get();
+    final sentencesSnap = await roomRef.collection('r1_sentences').get();
+    if (playersSnap.docs.isEmpty || sentencesSnap.docs.isEmpty) return;
+
+    final players = playersSnap.docs.map((d) => d.id).toList()..sort();
+    final sentenceIds = sentencesSnap.docs.map((d) => d.id).toList()..sort();
+    final sentenceAuthors = {for (final d in sentencesSnap.docs) d.id: (d.data()['authorUid'] as String? ?? '')};
+
+    final assignments = computeFillAssignments(playerUids: players, sentenceAuthors: sentenceAuthors, sentenceIds: sentenceIds);
+    final batch = db.batch();
+    final col = roomRef.collection('r1_assignments');
+    assignments.forEach((uid, sId) {
+      batch.set(col.doc(uid), {'baseSentenceId': sId, 'createdAt': FieldValue.serverTimestamp()});
+    });
+    await batch.commit();
+  }
 }

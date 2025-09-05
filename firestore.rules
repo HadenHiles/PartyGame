@@ -51,6 +51,13 @@ service cloud.firestore {
           request.resource.data.values.size() >= 1 && request.resource.data.values.size() <= 2;
         allow update, delete: if false; // immutable from clients
       }
+
+      // Round 1 assignments subcollection (host writes only)
+      match /r1_assignments/{uid} {
+        allow read: if isAuthed();
+        allow create: if isHost(resource.parent());
+        allow update, delete: if false;
+      }
     }
 
     // Deny everything else

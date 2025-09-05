@@ -3,6 +3,8 @@ import '../../services/room_service.dart';
 import '../../models/player.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/neon_background.dart';
+import '../../services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlayerWaitingScreen extends StatelessWidget {
   final String code;
@@ -58,6 +60,42 @@ class PlayerWaitingScreen extends StatelessWidget {
                       );
                     },
                   ),
+                ),
+                const SizedBox(height: 12),
+                // Developer shortcut: navigate to assigned fill
+                ElevatedButton(
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final router = GoRouter.of(context);
+                    final uid = FirebaseService().uid;
+                    if (uid == null) {
+                      messenger.showSnackBar(const SnackBar(content: Text('Not signed in.')));
+                      return;
+                    }
+                    try {
+                      final db = FirebaseFirestore.instance;
+                      final asn = await db.collection('rooms').doc(code).collection('r1_assignments').doc(uid).get();
+                      if (!asn.exists) {
+                        messenger.showSnackBar(const SnackBar(content: Text('No assignment yet.')));
+                        return;
+                      }
+                      final baseId = asn.data()?['baseSentenceId'] as String?;
+                      if (baseId == null) {
+                        messenger.showSnackBar(const SnackBar(content: Text('Assignment malformed.')));
+                        return;
+                      }
+                      final sent = await db.collection('rooms').doc(code).collection('r1_sentences').doc(baseId).get();
+                      final tmpl = sent.data()?['textTemplate'] as String?;
+                      if (tmpl == null) {
+                        messenger.showSnackBar(const SnackBar(content: Text('Sentence missing.')));
+                        return;
+                      }
+                      router.go('/r1/fill/$code?id=$baseId&t=${Uri.encodeComponent(tmpl)}');
+                    } catch (e) {
+                      messenger.showSnackBar(SnackBar(content: Text('Error: $e')));
+                    }
+                  },
+                  child: const Text('Go to my Fill (DEV)'),
                 ),
               ],
             ),
