@@ -5,6 +5,7 @@ import '../screens/host/host_round_screen.dart';
 import '../screens/player/join_screen.dart';
 import '../screens/player/player_waiting_screen.dart';
 import '../screens/player/r1_author_screen.dart';
+import '../screens/player/r1_fill_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: <RouteBase>[
@@ -32,6 +33,17 @@ final GoRouter appRouter = GoRouter(
           path: 'r1/author/:code',
           name: 'r1Author',
           builder: (context, state) => R1AuthorScreen(code: state.pathParameters['code'] ?? '----'),
+        ),
+        GoRoute(
+          path: 'r1/fill/:code',
+          name: 'r1Fill',
+          builder: (context, state) {
+            final code = state.pathParameters['code'] ?? '----';
+            // For MVP, accept baseSentenceId and textTemplate via query params.
+            final baseId = state.uri.queryParameters['id'] ?? 'temp-id';
+            final tmpl = state.uri.queryParameters['t'] ?? 'I love {blank} on {blank} nights';
+            return R1FillScreen(code: code, baseSentenceId: baseId, textTemplate: tmpl);
+          },
         ),
       ],
     ),

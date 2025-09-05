@@ -40,6 +40,17 @@ service cloud.firestore {
           request.resource.data.blanksCount >= 1 && request.resource.data.blanksCount <= 2;
         allow update, delete: if false; // immutable from clients
       }
+
+      // Round 1 fills subcollection
+      match /r1_fills/{id} {
+        allow read: if isAuthed();
+        allow create: if isAuthed() &&
+          request.resource.data.fillerUid == request.auth.uid &&
+          request.resource.data.baseSentenceId is string &&
+          request.resource.data.values is list &&
+          request.resource.data.values.size() >= 1 && request.resource.data.values.size() <= 2;
+        allow update, delete: if false; // immutable from clients
+      }
     }
 
     // Deny everything else

@@ -26,4 +26,26 @@ class R1Service {
 
     await batch.commit();
   }
+
+  // Replaces {blank} tokens left-to-right with provided values.
+  String buildFilledText(String template, List<String> values) {
+    final parts = template.split('{blank}');
+    if (parts.length - 1 == 0) return template; // no blanks
+    final sb = StringBuffer();
+    for (var i = 0; i < parts.length; i++) {
+      sb.write(parts[i]);
+      if (i < parts.length - 1) {
+        final v = (i < values.length) ? values[i] : '';
+        sb.write(v);
+      }
+    }
+    return sb.toString();
+  }
+
+  Future<void> submitFill({required String code, required String uid, required String baseSentenceId, required List<String> values}) async {
+    final db = FirebaseFirestore.instance;
+    final roomRef = db.collection('rooms').doc(code);
+    final fills = roomRef.collection('r1_fills');
+    await fills.add({'baseSentenceId': baseSentenceId, 'fillerUid': uid, 'values': values, 'createdAt': FieldValue.serverTimestamp()});
+  }
 }
