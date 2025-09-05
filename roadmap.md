@@ -1,5 +1,73 @@
 # Flutter Party Game — Copilot Step‑By‑Step Plan
 
+## Progress Checklist
+
+Legend: [x] done • [ ] pending • [~] in progress
+
+- Pre‑flight
+  - [x] Target platforms limited to Web, iOS, Android (removed desktop folders)
+  - [x] App IDs updated to `com.hadenhiles.partygames` (Android namespace/applicationId, iOS bundle IDs)
+  - [x] Clean scaffold: GoRouter + theme + basic host/player screens
+  - [x] Firebase configured via FlutterFire (web/iOS/Android) and initialized at startup
+  - [ ] Add firebase_auth and anonymous auth bootstrap
+  - [ ] Emulator + Hosting wiring (serve web, functions)
+
+- 1) Initialize project & packages
+  - [x] Add packages: firebase_core, cloud_firestore, go_router, qr_flutter
+  - [ ] Add packages: firebase_auth, audioplayers, confetti, uuid, collection
+  - [ ] Add `.env.example` and simple `lib/env.dart`
+  - [ ] Functions project (TypeScript) + Hosting rewrites
+
+- 2) File tree scaffold
+  - [x] `lib/routing/app_router.dart`
+  - [x] `lib/theme/app_theme.dart`
+  - [x] `lib/models/{room.dart, player.dart, phase.dart}`
+  - [x] `lib/services/{firebase_service.dart, room_service.dart}` (room service in‑memory for now)
+  - [x] `lib/screens/host/host_lobby_screen.dart`
+  - [x] `lib/screens/player/{join_screen.dart, player_waiting_screen.dart}`
+  - [ ] Remaining screens and services from the tree (R1/R2/R3, widgets, etc.)
+
+- 3) Data model (Firestore)
+  - [ ] Define full Firestore collection schemas and serializers
+
+- 4) Security rules
+  - [ ] Lock down writes (players self‑writes only; phases/scores via Functions)
+
+- 5) Cloud Functions — core game flow
+  - [ ] Implement callable functions (createRoom, joinRoom, advancePhase, submit/vote/tally)
+
+- 6) Pairing & scoring helpers
+  - [ ] Shared helpers in Functions + mirrored Dart versions with tests
+
+- 7) AI sentence service
+  - [ ] Mock + remote stub providers
+
+- 8) Audio & visual flair
+  - [ ] Audio assets + `audio_service.dart`; confetti wiring
+
+- 9) Host & player flows — UI
+  - [ ] Implement host/player screens and routing per roadmap
+
+- 10) Timers & phase sync
+  - [ ] Read‑only timers from Firestore; host advance
+
+- 11) Voting & fairness
+  - [ ] Enforce voting constraints client + server side
+
+- 12) Leaderboard & scoring
+  - [ ] Aggregate and animate standings
+
+- 13) Routing glue & environment toggles
+  - [ ] App routes and dev debug controls
+
+- 14) Tests (Dart & Functions)
+  - [ ] Unit tests for pairing, scoring, validation (Dart + Functions)
+
+- 15) Deploy scripts & local dev
+  - [ ] Emulators, deploy scripts, hosting rewrites
+
+— The remaining detailed steps (16–25) remain pending and will be checked off as implemented.
+
 > A detailed, paste‑ready sequence of Copilot/GPT‑5 prompts to scaffold and implement a Jackbox‑style, multi‑device party game in Flutter + Firebase. Host (TV) runs the **Host app screen**, players join from phones via web or app.
 
 0. Overview & Assumptions (read first)
