@@ -37,6 +37,23 @@ class PlayerWaitingScreen extends StatelessWidget {
                         if (!context.mounted) return;
                         context.go('/r1/author/$code');
                       });
+                    } else if (phase == 'fill') {
+                      // If fill phase begins and player has an assignment, route to fill
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        if (!context.mounted) return;
+                        final uid = FirebaseService().uid;
+                        if (uid == null) return;
+                        final db = FirebaseFirestore.instance;
+                        final asn = await db.collection('rooms').doc(code).collection('r1_assignments').doc(uid).get();
+                        if (!asn.exists) return;
+                        final baseId = asn.data()?['baseSentenceId'] as String?;
+                        if (baseId == null) return;
+                        final sent = await db.collection('rooms').doc(code).collection('r1_sentences').doc(baseId).get();
+                        final tmpl = sent.data()?['textTemplate'] as String?;
+                        if (tmpl == null) return;
+                        if (!context.mounted) return;
+                        context.go('/r1/fill/$code?id=$baseId&t=${Uri.encodeComponent(tmpl)}');
+                      });
                     }
                     return Text('Waiting for host to start... (phase: $phase)', style: const TextStyle(fontWeight: FontWeight.w800));
                   },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/neon_background.dart';
 import '../../services/r1_service.dart';
+import '../../services/phase_service.dart';
 
 class HostRoundScreen extends StatelessWidget {
   final String code;
@@ -13,6 +14,23 @@ class HostRoundScreen extends StatelessWidget {
       body: Stack(
         children: [
           const NeonAnimatedBackground(),
+          // Auto-advance: when all players have r1_author progress, navigate to Fill phase (host view keeps same screen for now)
+          StreamBuilder<bool>(
+            stream: PhaseService().allPlayersDone(code, progressKey: 'r1_author'),
+            builder: (context, snapshot) {
+              final allDone = snapshot.data == true;
+              if (allDone) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!context.mounted) return;
+                  // Advance room phase to fill
+                  PhaseService().advancePhase(code, nextPhase: 'fill');
+                  // Host can remain on screen or navigate; for now just show a banner
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All players done authoring. Moving to Fill.')));
+                });
+              }
+              return const SizedBox.shrink();
+            },
+          ),
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(

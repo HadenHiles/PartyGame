@@ -25,6 +25,10 @@ class R1Service {
     batch.set(doc2, {'authorUid': uid, 'textTemplate': s2.trim(), 'blanksCount': _countBlanks(s2), 'createdAt': now});
 
     await batch.commit();
+    // Mark player progress for author phase
+    await roomRef.collection('players').doc(uid).set({
+      'progress': {'r1_author': true},
+    }, SetOptions(merge: true));
   }
 
   // Replaces {blank} tokens left-to-right with provided values.
@@ -47,6 +51,10 @@ class R1Service {
     final roomRef = db.collection('rooms').doc(code);
     final fills = roomRef.collection('r1_fills');
     await fills.add({'baseSentenceId': baseSentenceId, 'fillerUid': uid, 'values': values, 'createdAt': FieldValue.serverTimestamp()});
+    // Mark player progress for fill phase
+    await roomRef.collection('players').doc(uid).set({
+      'progress': {'r1_fill': true},
+    }, SetOptions(merge: true));
   }
 
   // Assignment model: map playerUid -> baseSentenceId

@@ -90,7 +90,12 @@ Legend: [x] done • [ ] pending • [~] in progress
   - [ ] Unit tests for pairing, scoring, validation (Dart + Functions)
 
 - 15. Deploy scripts & local dev
+
   - [ ] Emulators, deploy scripts, hosting rewrites
+
+- 16. AI Powered TTS Game Host
+  - [ ] Follow instructions from https://dev.to/noahvelasco/amplify-your-flutter-apps-with-elevenlabs-tts-api-a-simple-guide-5147 to implement an awesome game host voice
+  - [ ] Automate "script" for AI Host to read/speak at key points of the game (time running out, calling out players jumping up the leaderboard, quipy one liners to keep players who have completed their phase from getting bored while waiting for others)
 
 — The remaining detailed steps (16–25) remain pending and will be checked off as implemented.
 
