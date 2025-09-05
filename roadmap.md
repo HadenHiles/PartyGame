@@ -5,20 +5,23 @@
 Legend: [x] done • [ ] pending • [~] in progress
 
 - Pre‑flight
+
   - [x] Target platforms limited to Web, iOS, Android (removed desktop folders)
   - [x] App IDs updated to `com.hadenhiles.partygames` (Android namespace/applicationId, iOS bundle IDs)
   - [x] Clean scaffold: GoRouter + theme + basic host/player screens
   - [x] Firebase configured via FlutterFire (web/iOS/Android) and initialized at startup
-  - [ ] Add firebase_auth and anonymous auth bootstrap
+  - [x] Add firebase_auth and anonymous auth bootstrap
   - [ ] Emulator + Hosting wiring (serve web, functions)
 
-- 1) Initialize project & packages
+- 1. Initialize project & packages
+
   - [x] Add packages: firebase_core, cloud_firestore, go_router, qr_flutter
-  - [ ] Add packages: firebase_auth, audioplayers, confetti, uuid, collection
+  - [~] Add packages: firebase_auth, audioplayers, confetti, uuid, collection (firebase_auth added)
   - [ ] Add `.env.example` and simple `lib/env.dart`
   - [ ] Functions project (TypeScript) + Hosting rewrites
 
-- 2) File tree scaffold
+- 2. File tree scaffold
+
   - [x] `lib/routing/app_router.dart`
   - [x] `lib/theme/app_theme.dart`
   - [x] `lib/models/{room.dart, player.dart, phase.dart}`
@@ -27,43 +30,55 @@ Legend: [x] done • [ ] pending • [~] in progress
   - [x] `lib/screens/player/{join_screen.dart, player_waiting_screen.dart}`
   - [ ] Remaining screens and services from the tree (R1/R2/R3, widgets, etc.)
 
-- 3) Data model (Firestore)
+- 3. Data model (Firestore)
+
   - [ ] Define full Firestore collection schemas and serializers
 
-- 4) Security rules
+- 4. Security rules
+
   - [ ] Lock down writes (players self‑writes only; phases/scores via Functions)
 
-- 5) Cloud Functions — core game flow
+- 5. Cloud Functions — core game flow
+
   - [ ] Implement callable functions (createRoom, joinRoom, advancePhase, submit/vote/tally)
 
-- 6) Pairing & scoring helpers
+- 6. Pairing & scoring helpers
+
   - [ ] Shared helpers in Functions + mirrored Dart versions with tests
 
-- 7) AI sentence service
+- 7. AI sentence service
+
   - [ ] Mock + remote stub providers
 
-- 8) Audio & visual flair
+- 8. Audio & visual flair
+
   - [ ] Audio assets + `audio_service.dart`; confetti wiring
 
-- 9) Host & player flows — UI
+- 9. Host & player flows — UI
+
   - [ ] Implement host/player screens and routing per roadmap
 
-- 10) Timers & phase sync
+- 10. Timers & phase sync
+
   - [ ] Read‑only timers from Firestore; host advance
 
-- 11) Voting & fairness
+- 11. Voting & fairness
+
   - [ ] Enforce voting constraints client + server side
 
-- 12) Leaderboard & scoring
+- 12. Leaderboard & scoring
+
   - [ ] Aggregate and animate standings
 
-- 13) Routing glue & environment toggles
+- 13. Routing glue & environment toggles
+
   - [ ] App routes and dev debug controls
 
-- 14) Tests (Dart & Functions)
+- 14. Tests (Dart & Functions)
+
   - [ ] Unit tests for pairing, scoring, validation (Dart + Functions)
 
-- 15) Deploy scripts & local dev
+- 15. Deploy scripts & local dev
   - [ ] Emulators, deploy scripts, hosting rewrites
 
 — The remaining detailed steps (16–25) remain pending and will be checked off as implemented.
@@ -113,7 +128,7 @@ Legend: [x] done • [ ] pending • [~] in progress
 
 > Create the following file tree with complete stub files and TODOs at the top of each file. Ensure imports compile.
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`  lib/    main.dart    routing/app_router.dart    theme/app_theme.dart    services/      firebase_service.dart      room_service.dart      phase_service.dart      audio_service.dart      scoring_service.dart      pairing_service.dart      ai_sentence_service.dart   // pluggable (mock/default), later replace with real AI    models/      room.dart      player.dart      phase.dart      round_models.dart          // sentences, blanks, cards, ballots, scores    screens/      host/        host_lobby_screen.dart        host_round_screen.dart       // shows countdown, matchups, VS UI        host_leaderboard_screen.dart        host_final_scores_screen.dart      player/        join_screen.dart        player_waiting_screen.dart        r1_author_screen.dart        // author 2 sentences w/ 1–2 blanks        r1_fill_screen.dart          // fill blanks for 2 random sentences        r_voting_screen.dart         // generic voting screen (R1/R2 1v1)        r2_cards_input_screen.dart   // rapid word entry        r2_sentence_choose_screen.dart // pick among 2 AI prompts, fill with cards        r3_remix_screen.dart         // final edit with constrained regions        leaderboard_interstitial.dart    widgets/      room_code_banner.dart      timer_pill.dart      vs_battle_card.dart      vote_button.dart      podium_widget.dart      toast.dart  functions/    src/      index.ts      game.ts           // HTTPS callable + triggers      pairing.ts        // deterministic pairing helpers      scoring.ts        // scoring + tie‑break logic      ai.ts             // (optional) calls provider; mock fallback      types.ts    test/      pairing.test.ts      scoring.test.ts  test/    unit/      pairing_service_test.dart      scoring_service_test.dart  `
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`lib/    main.dart    routing/app_router.dart    theme/app_theme.dart    services/      firebase_service.dart      room_service.dart      phase_service.dart      audio_service.dart      scoring_service.dart      pairing_service.dart      ai_sentence_service.dart   // pluggable (mock/default), later replace with real AI    models/      room.dart      player.dart      phase.dart      round_models.dart          // sentences, blanks, cards, ballots, scores    screens/      host/        host_lobby_screen.dart        host_round_screen.dart       // shows countdown, matchups, VS UI        host_leaderboard_screen.dart        host_final_scores_screen.dart      player/        join_screen.dart        player_waiting_screen.dart        r1_author_screen.dart        // author 2 sentences w/ 1–2 blanks        r1_fill_screen.dart          // fill blanks for 2 random sentences        r_voting_screen.dart         // generic voting screen (R1/R2 1v1)        r2_cards_input_screen.dart   // rapid word entry        r2_sentence_choose_screen.dart // pick among 2 AI prompts, fill with cards        r3_remix_screen.dart         // final edit with constrained regions        leaderboard_interstitial.dart    widgets/      room_code_banner.dart      timer_pill.dart      vs_battle_card.dart      vote_button.dart      podium_widget.dart      toast.dart  functions/    src/      index.ts      game.ts           // HTTPS callable + triggers      pairing.ts        // deterministic pairing helpers      scoring.ts        // scoring + tie‑break logic      ai.ts             // (optional) calls provider; mock fallback      types.ts    test/      pairing.test.ts      scoring.test.ts  test/    unit/      pairing_service_test.dart      scoring_service_test.dart`
 
 3. Data model (Firestore)
 
@@ -353,7 +368,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 > Fill in audio_service.dart and show usage examples in 3 screens. Use audioplayers with simple helpers and ensure lifecycle safe.
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`  // lib/services/audio_service.dart  import 'package:audioplayers/audioplayers.dart';  class AudioService {    static final AudioService _i = AudioService._();    factory AudioService() => _i;    AudioService._();    final _music = AudioPlayer()..setReleaseMode(ReleaseMode.loop);    final _sfx = AudioPlayer();    Future preload() async {      await Future.wait([        _sfx.setSource(AssetSource('audio/whoosh.mp3')),      ]);    }    Future playSfx(String asset) => _sfx.play(AssetSource('audio/$asset'));    Future playMusic(String asset) => _music.play(AssetSource('audio/$asset'));    Future stopMusic() => _music.stop();  }  `
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`// lib/services/audio_service.dart  import 'package:audioplayers/audioplayers.dart';  class AudioService {    static final AudioService _i = AudioService._();    factory AudioService() => _i;    AudioService._();    final _music = AudioPlayer()..setReleaseMode(ReleaseMode.loop);    final _sfx = AudioPlayer();    Future preload() async {      await Future.wait([        _sfx.setSource(AssetSource('audio/whoosh.mp3')),      ]);    }    Future playSfx(String asset) => _sfx.play(AssetSource('audio/$asset'));    Future playMusic(String asset) => _music.play(AssetSource('audio/$asset'));    Future stopMusic() => _music.stop();  }`
 
 20. Confetti — template code
 

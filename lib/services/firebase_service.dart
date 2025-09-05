@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +13,25 @@ class FirebaseService {
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
+  String? get uid {
+    try {
+      return FirebaseAuth.instance.currentUser?.uid;
+    } catch (_) {
+      // No default app in test or init not completed yet
+      return null;
+    }
+  }
 
   Future<void> initIfNeeded() async {
     if (_initialized) return;
-    // Will be replaced with real Firebase init once options are present.
-    debugPrint('FirebaseService: waiting for flutterfire config.');
-    _initialized = true; // keep app flow unblocked during scaffolding
+    // In case this is called before main() initializes Firebase (e.g., tests),
+    // we keep this lightweight. Auth sign-in will fail safely if Firebase isn't ready yet.
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+      debugPrint('FirebaseService: signed in anonymously as ${FirebaseAuth.instance.currentUser?.uid}');
+    } catch (e) {
+      debugPrint('FirebaseService: anonymous sign-in skipped ($e)');
+    }
+    _initialized = true;
   }
 }
