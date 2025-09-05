@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "575139756096",
+    "project_id": "party-games-canada",
+    "storage_bucket": "party-games-canada.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575139756096:android:045f282c386ad3255b07a5",
+        "android_client_info": {
+          "package_name": "com.hadenhiles.partygames"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp48whMoVYrOJoOPWOOV_nTzUFO9_deFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
