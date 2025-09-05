@@ -11,12 +11,14 @@ Legend: [x] done • [ ] pending • [~] in progress
   - [x] Clean scaffold: GoRouter + theme + basic host/player screens
   - [x] Firebase configured via FlutterFire (web/iOS/Android) and initialized at startup
   - [x] Add firebase_auth and anonymous auth bootstrap
+  - [x] Neon animated background on core screens (Join, Host Lobby, Waiting, Host Round, R1 Author)
+  - [x] Confetti overlay integrated (Host start, Author submit)
   - [ ] Emulator + Hosting wiring (serve web, functions)
 
 - 1. Initialize project & packages
 
   - [x] Add packages: firebase_core, cloud_firestore, go_router, qr_flutter
-  - [~] Add packages: firebase_auth, audioplayers, confetti, uuid, collection (firebase_auth added)
+  - [~] Add packages: firebase_auth, audioplayers, confetti, uuid, collection (firebase_auth, confetti added)
   - [ ] Add `.env.example` and simple `lib/env.dart`
   - [ ] Functions project (TypeScript) + Hosting rewrites
 
@@ -52,11 +54,16 @@ Legend: [x] done • [ ] pending • [~] in progress
 
 - 8. Audio & visual flair
 
-  - [ ] Audio assets + `audio_service.dart`; confetti wiring
+  - [~] Confetti overlay wired in Host/Author screens; Audio assets + `audio_service.dart` pending
 
 - 9. Host & player flows — UI
 
-  - [ ] Implement host/player screens and routing per roadmap
+  - [~] Implement host/player screens and routing per roadmap
+    - [x] host_lobby_screen.dart (room code, players list, start button)
+    - [~] host_round_screen.dart (placeholder layout; timer/VS pending)
+    - [x] player/join_screen.dart (polished UI)
+    - [x] player/player_waiting_screen.dart (auto-route on phase)
+    - [~] player/r1_author_screen.dart (UI + confetti; submit logic pending)
 
 - 10. Timers & phase sync
 

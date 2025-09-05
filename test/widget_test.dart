@@ -11,6 +11,6 @@ void main() {
     await tester.pumpWidget(const PartyGameApp());
 
     // Expect the Join screen app bar/title text to be present
-    expect(find.text('Join Game'), findsOneWidget);
+    expect(find.text('Join the Party 🎉'), findsOneWidget);
   });
 }
