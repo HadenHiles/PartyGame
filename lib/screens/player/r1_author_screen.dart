@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../widgets/neon_background.dart';
 import '../../widgets/confetti_overlay.dart';
+import '../../services/r1_service.dart';
+import '../../services/firebase_service.dart';
 
 class R1AuthorScreen extends StatefulWidget {
   final String code;
@@ -14,6 +16,7 @@ class _R1AuthorScreenState extends State<R1AuthorScreen> {
   final s1Ctrl = TextEditingController();
   final s2Ctrl = TextEditingController();
   final confettiKey = GlobalKey<ConfettiOverlayState>();
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -61,12 +64,35 @@ class _R1AuthorScreenState extends State<R1AuthorScreen> {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  onPressed: () {
-                    // TODO: Validate and submit sentences to Firestore
-                    confettiKey.currentState?.burst();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sentences submitted!')));
-                  },
-                  child: const Text('SUBMIT SENTENCES'),
+                  onPressed: _submitting
+                      ? null
+                      : () async {
+                          final s1 = s1Ctrl.text.trim();
+                          final s2 = s2Ctrl.text.trim();
+                          final messenger = ScaffoldMessenger.of(context);
+                          final uid = FirebaseService().uid;
+                          if (uid == null) {
+                            messenger.showSnackBar(const SnackBar(content: Text('Not signed in. Try again.')));
+                            return;
+                          }
+                          if (!R1Service().isTemplateValid(s1) || !R1Service().isTemplateValid(s2)) {
+                            messenger.showSnackBar(const SnackBar(content: Text('Each sentence must include 1–2 {blank} tokens.')));
+                            return;
+                          }
+                          setState(() => _submitting = true);
+                          try {
+                            await R1Service().submitSentences(code: widget.code, uid: uid, s1: s1, s2: s2);
+                            if (!mounted) return;
+                            confettiKey.currentState?.burst();
+                            messenger.showSnackBar(const SnackBar(content: Text('Sentences submitted!')));
+                          } catch (e) {
+                            if (!mounted) return;
+                            messenger.showSnackBar(SnackBar(content: Text('Submit failed: $e')));
+                          } finally {
+                            if (mounted) setState(() => _submitting = false);
+                          }
+                        },
+                  child: Text(_submitting ? 'Submitting…' : 'SUBMIT SENTENCES'),
                 ),
               ],
             ),

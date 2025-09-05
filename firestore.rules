@@ -29,6 +29,17 @@ service cloud.firestore {
         // No deletes from clients for now
         allow delete: if false;
       }
+
+      // Round 1 sentences subcollection
+      match /r1_sentences/{id} {
+        allow read: if isAuthed();
+        allow create: if isAuthed() &&
+          request.resource.data.authorUid == request.auth.uid &&
+          request.resource.data.textTemplate is string &&
+          request.resource.data.blanksCount is int &&
+          request.resource.data.blanksCount >= 1 && request.resource.data.blanksCount <= 2;
+        allow update, delete: if false; // immutable from clients
+      }
     }
 
     // Deny everything else
