@@ -14,6 +14,8 @@ class JoinScreen extends StatefulWidget {
 class _JoinScreenState extends State<JoinScreen> {
   final _nameCtrl = TextEditingController();
   final _codeCtrl = TextEditingController();
+  bool _joining = false;
+  bool _hosting = false;
 
   @override
   void dispose() {
@@ -22,8 +24,47 @@ class _JoinScreenState extends State<JoinScreen> {
     super.dispose();
   }
 
+  Future<void> _handleJoin() async {
+    final raw = _codeCtrl.text.trim();
+    if (raw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter a room code.')));
+      return;
+    }
+    final code = raw.toUpperCase();
+    final uid = FirebaseService().uid ?? 'anon';
+    final displayName = _nameCtrl.text.trim().isEmpty ? 'Player' : _nameCtrl.text.trim();
+    setState(() => _joining = true);
+    try {
+      await RoomService().joinRoom(code: code, uid: uid, displayName: displayName);
+      if (!mounted) return;
+      context.go('/wait/$code');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to join: ${e is StateError ? e.message : e.toString()}')));
+    } finally {
+      if (mounted) setState(() => _joining = false);
+    }
+  }
+
+  Future<void> _handleHost() async {
+    final uid = FirebaseService().uid ?? 'anon';
+    final displayName = _nameCtrl.text.trim().isEmpty ? 'Host' : _nameCtrl.text.trim();
+    setState(() => _hosting = true);
+    try {
+      final code = await RoomService().createRoom(hostUid: uid, hostDisplayName: displayName);
+      if (!mounted) return;
+      context.go('/host/$code');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to host: $e')));
+    } finally {
+      if (mounted) setState(() => _hosting = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final busy = _joining || _hosting;
     return Scaffold(
       appBar: AppBar(title: const Text('Join the Party 🎉')),
       body: Stack(
@@ -47,47 +88,39 @@ class _JoinScreenState extends State<JoinScreen> {
                         TextField(
                           controller: _nameCtrl,
                           decoration: const InputDecoration(labelText: 'Your display name'),
+                          enabled: !busy,
                         ),
                         const SizedBox(height: 12),
                         TextField(
                           controller: _codeCtrl,
                           decoration: const InputDecoration(labelText: 'Room code (e.g. W4V3Z)'),
                           textCapitalization: TextCapitalization.characters,
+                          enabled: !_hosting, // allow editing while not hosting
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (_codeCtrl.text.trim().isEmpty) return;
-                            final code = _codeCtrl.text.trim().toUpperCase();
-                            final uid = FirebaseService().uid ?? 'anon';
-                            final displayName = _nameCtrl.text.trim().isEmpty ? 'Player' : _nameCtrl.text.trim();
-                            try {
-                              await RoomService().joinRoom(code: code, uid: uid, displayName: displayName);
-                              if (!context.mounted) return;
-                              context.go('/wait/$code');
-                            } catch (e) {
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to join: ${e is StateError ? e.message : e.toString()}')));
-                            }
-                          },
-                          child: const Text('LET’S GO'),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: busy ? null : _handleHost,
+                                child: _hosting ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('HOST GAME'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: busy ? null : _handleJoin,
+                                child: _joining ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('JOIN GAME'),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () async {
-                    // For quick host testing: create a room then navigate
-                    final uid = FirebaseService().uid ?? 'anon';
-                    final displayName = _nameCtrl.text.trim().isEmpty ? 'Host' : _nameCtrl.text.trim();
-                    final code = await RoomService().createRoom(hostUid: uid, hostDisplayName: displayName);
-                    if (!context.mounted) return;
-                    context.go('/host/$code');
-                  },
-                  child: const Text('Host a game (dev)'),
-                ),
+                const Text('Enter a code to join or host a fresh room.', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
