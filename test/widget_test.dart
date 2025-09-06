@@ -7,10 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:partygames/main.dart';
 
 void main() {
-  testWidgets('App boots and shows Join screen', (tester) async {
+  testWidgets('App boots and shows entry selection screen', (tester) async {
     await tester.pumpWidget(const PartyGameApp());
 
-    // Expect the Join screen app bar/title text to be present
-    expect(find.text('Join the Party 🎉'), findsOneWidget);
+    // New AppBar title
+    expect(find.text('PartyGames 🎉'), findsOneWidget);
+    // Selection prompt present
+    expect(find.text('How do you want to start?'), findsOneWidget);
   });
 }

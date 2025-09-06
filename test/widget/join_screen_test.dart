@@ -4,14 +4,19 @@ import 'package:go_router/go_router.dart';
 import 'package:partygames/services/room_service.dart';
 import 'package:partygames/screens/player/join_screen.dart';
 
+Future<void> pumpTransition(WidgetTester tester) async {
+  // Allow a few frames for AnimatedSwitcher (250ms configured) without waiting forever
+  await tester.pump(const Duration(milliseconds: 50));
+  await tester.pump(const Duration(milliseconds: 250));
+}
+
 void main() {
   group('JoinScreen', () {
     setUp(() {
       RoomService.use(MemoryRoomService());
     });
 
-    testWidgets('host flow navigates to host route', (tester) async {
-      // Router to capture navigation
+    testWidgets('host flow navigates to host route after selection', (tester) async {
       late GoRouter router;
       router = GoRouter(
         routes: [
@@ -24,10 +29,15 @@ void main() {
       );
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
 
+      // Select host mode
+      await tester.tap(find.text('HOST A GAME'));
+      await pumpTransition(tester);
+
+      // Enter optional name and create
       await tester.enterText(find.byType(TextField).first, 'Hosty');
-      await tester.tap(find.text('HOST GAME'));
-      await tester.pump(); // start async
-      await tester.pump(const Duration(milliseconds: 100)); // allow navigation
+      await tester.tap(find.text('CREATE ROOM'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 120));
 
       expect(find.textContaining('Host:'), findsOneWidget);
     });
@@ -49,15 +59,45 @@ void main() {
       );
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
 
-      final textFields = find.byType(TextField);
-      // First is name, second is code
-      await tester.enterText(textFields.at(0), 'PlayerX');
-      await tester.enterText(textFields.at(1), lower);
-      await tester.tap(find.text('JOIN GAME'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      // Select join mode
+      await tester.tap(find.text('JOIN A GAME'));
+      await pumpTransition(tester);
 
-      expect(find.text('Wait:$code'), findsOneWidget); // should show uppercase original
+      // Two text fields: name then code
+      final tfs = find.byType(TextField);
+      await tester.enterText(tfs.at(0), 'PlayerX');
+      await tester.enterText(tfs.at(1), lower);
+      await tester.tap(find.text('JOIN ROOM'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 120));
+
+      expect(find.text('Wait:$code'), findsOneWidget);
+    });
+
+    testWidgets('back navigation returns to selection screen', (tester) async {
+      late GoRouter router;
+      router = GoRouter(
+        routes: [GoRoute(path: '/', builder: (_, __) => const JoinScreen())],
+      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+      // Enter join mode
+      await tester.tap(find.text('JOIN A GAME'));
+      await pumpTransition(tester);
+      expect(find.text('Join a Game'), findsOneWidget);
+
+      // Tap back arrow
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await pumpTransition(tester);
+      expect(find.text('How do you want to start?'), findsOneWidget);
+
+      // Go host mode and back
+      await tester.tap(find.text('HOST A GAME'));
+      await pumpTransition(tester);
+      expect(find.text('Host a Game'), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await pumpTransition(tester);
+      expect(find.text('How do you want to start?'), findsOneWidget);
     });
   });
 }
